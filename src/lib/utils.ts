@@ -45,3 +45,26 @@ export function safeSave<T>(key: string, val: T): void {
     // Silent fail
   }
 }
+
+export async function triggerDownload(url: string, filename: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Download failed');
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.warn('Direct download failed, falling back to window.open', error);
+    window.open(url, '_blank');
+  }
+}
+
+export function getLessonId(systemKey: string|null, stageId: string|null, gradeId: number|string|null, subjectName: string|null, termKey: string|null, unitTitle: string|null, lessonName: string|null) {
+  return hashString(`${systemKey}-${stageId}-${gradeId}-${subjectName}-${termKey}-${unitTitle}-${lessonName}`);
+}

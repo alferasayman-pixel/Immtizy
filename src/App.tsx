@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './lib/appContext';
 import { ExamProvider } from './lib/examContext';
+import { AuthProvider, useAuth } from './lib/authContext';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import HomeView from './views/HomeView';
@@ -15,11 +16,23 @@ import DashboardView from './views/DashboardView';
 import AdminView from './views/AdminView';
 import ExamOverlay from './components/ExamOverlay';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ChartLine, Settings } from 'lucide-react';
+import { Search, ChartLine, Settings, LogIn } from 'lucide-react';
 
 function AppContent() {
   const { navStack, pushNav } = useApp();
+  const { user, loading, signInWithGoogle } = useAuth();
   const currentView = navStack[navStack.length - 1];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg font-tajawal">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-black text-slate-500">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderView = () => {
     switch (currentView) {
@@ -38,7 +51,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden font-tajawal">
       <Header />
       
       <main className="p-5 max-w-md mx-auto w-full">
@@ -57,6 +70,15 @@ function AppContent() {
 
       {/* Floating Action Buttons from Prototype */}
       <div className="fixed right-5 bottom-[110px] z-30 flex flex-col gap-3">
+        {!user && (
+          <button 
+            onClick={signInWithGoogle}
+            className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-xl animate-pulse"
+            title="تسجيل الدخول"
+          >
+            <LogIn size={20} />
+          </button>
+        )}
         <button 
           onClick={() => pushNav('dashboard', 'لوحة المتابعة')}
           className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-700 shadow-xl"
@@ -79,10 +101,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <ExamProvider>
-        <AppContent />
-      </ExamProvider>
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <ExamProvider>
+          <AppContent />
+        </ExamProvider>
+      </AppProvider>
+    </AuthProvider>
   );
 }

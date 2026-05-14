@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Private user profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Purchase": {
+      "title": "User Purchase",
+      "description": "Records of purchased products",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "purchasedAt": { "type": "string", "format": "date-time" },
+        "price": { "type": "number" }
+      },
+      "required": ["productId", "purchasedAt"]
+    },
+    "ExamResult": {
+      "title": "Exam Result",
+      "description": "Records of exam attempts and scores",
+      "type": "object",
+      "properties": {
+        "subject": { "type": "string" },
+        "lesson": { "type": "string" },
+        "unit": { "type": "string" },
+        "score": { "type": "number" },
+        "total": { "type": "number" },
+        "pct": { "type": "number" },
+        "timeout": { "type": "boolean" },
+        "timeSpent": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["subject", "lesson", "score", "total", "pct", "createdAt"]
+    },
+    "Product": {
+      "title": "Store Product",
+      "description": "Files and bundles in the store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["file", "bundle"] },
+        "system": { "type": "string" },
+        "stage": { "type": "string" },
+        "grade": { "type": "number" },
+        "stream": { "type": "string" },
+        "subject": { "type": "string" },
+        "term": { "type": "string" },
+        "kind": { "type": "string", "enum": ["notes", "summary", "solutions"] },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "pdfUrl": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "type", "title", "price"]
+    },
+    "LessonOverride": {
+      "title": "Lesson Exam Override",
+      "description": "Customized exam questions for a specific lesson",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lessonName": { "type": "string" },
+        "requiredProductId": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "q": { "type": "string" },
+              "a": { "type": "array", "items": { "type": "string" } },
+              "c": { "type": "number" }
+            },
+            "required": ["q", "a", "c"]
+          }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "questions"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Public store products"
+    },
+    "/curriculum/{lessonId}": {
+      "schema": "LessonOverride",
+      "description": "Customized exams for curriculum lessons"
+    },
+    "/users/{userId}/private/profile": {
+      "schema": "User",
+      "description": "Private user information"
+    },
+    "/users/{userId}/purchases/{purchaseId}": {
+      "schema": "Purchase",
+      "description": "User's purchased items"
+    },
+    "/users/{userId}/examHistory/{historyId}": {
+      "schema": "ExamResult",
+      "description": "User's exam results"
+    }
+  }
+}

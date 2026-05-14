@@ -89,3 +89,11 @@ export interface ExamHistoryItem {
   timeout: boolean;
   timeSpent: number;
 }
+
+export interface LessonOverride {
+  id: string; // hash of path
+  lessonName: string;
+  questions: Question[];
+  requiredProductId?: string;
+  updatedAt?: any;
+}
